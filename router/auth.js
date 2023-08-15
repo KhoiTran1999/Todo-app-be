@@ -18,8 +18,10 @@ router.post("/verifyEmail", authController.verifyEmail);
 
 router.get("/checkEmailToken/:token", authController.checkEmailToken);
 
-router.get("/cookie/setToken", authController.setToken);
+router.post("/cookie/setToken", authController.setToken);
 
 router.get("/cookie/getToken", authController.getToken);
+
+router.post("/cookie/refreshToken", authController.refreshToken);
 
 module.exports = router;

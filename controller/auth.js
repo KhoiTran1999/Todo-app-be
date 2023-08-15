@@ -40,17 +40,29 @@ const login = asyncMiddleware(async (req, res, next) => {
     throw new ErrorResponse(401, "Invalid email/password");
   }
 
-  const token = jwt.sign(
+  const accessToken = jwt.sign(
     {
       email: user.email,
     },
-    env.JWT_PRIVATE_KEY,
-    { expiresIn: env.JWT_EXPIRED_IN }
+    env.JWT_ACCESSTOKEN_PRIVATE_KEY,
+    { expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN }
   );
 
-  res.cookie("token", token).status(201).json({
-    success: true,
-  });
+  const refreshToken = jwt.sign(
+    {
+      email: user.email,
+    },
+    env.JWT_REFRESHTOKEN_PRIVATE_KEY,
+    { expiresIn: env.JWT_EXPIRED_IN_REFRESHTOKEN }
+  );
+
+  res
+    .cookie("accessToken", accessToken)
+    .cookie("refreshToken", refreshToken)
+    .status(201)
+    .json({
+      success: true,
+    });
 });
 
 const verifyEmail = asyncMiddleware(async (req, res, next) => {
@@ -61,8 +73,8 @@ const verifyEmail = asyncMiddleware(async (req, res, next) => {
     throw new ErrorResponse(409, "Invalid email");
   }
 
-  const token = jwt.sign({ email }, env.JWT_PRIVATE_KEY, {
-    expiresIn: env.JWT_EXPIRED_IN,
+  const token = jwt.sign({ email }, env.JWT_ACCESSTOKEN_PRIVATE_KEY, {
+    expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN,
   });
 
   const encodeToken = encodeURIComponent(token);
@@ -90,12 +102,12 @@ const verifyEmail = asyncMiddleware(async (req, res, next) => {
 const checkEmailToken = asyncMiddleware(async (req, res, next) => {
   const { token } = req.params;
   const decodeToken = decodeURIComponent(token);
-  const user = jwt.verify(decodeToken, env.JWT_PRIVATE_KEY);
+  const user = jwt.verify(decodeToken, env.JWT_ACCESSTOKEN_PRIVATE_KEY);
 
   if (!user) {
     throw new ErrorResponse(401, "Unauthorized");
   }
-  console.log("user.email: ", user.email);
+
   const tokenEmail = await registerToken.findOne({
     email: user.email,
     token: decodeToken,
@@ -116,25 +128,70 @@ const checkEmailToken = asyncMiddleware(async (req, res, next) => {
 
 const setToken = asyncMiddleware(async (req, res, next) => {
   const { email } = req.body;
-  const token = jwt.sign(
+
+  const accessToken = jwt.sign(
     {
       email,
     },
-    env.JWT_PRIVATE_KEY,
-    { expiresIn: env.JWT_EXPIRED_IN }
+    env.JWT_ACCESSTOKEN_PRIVATE_KEY,
+    { expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN }
+  );
+
+  const refreshToken = jwt.sign(
+    {
+      email,
+    },
+    env.JWT_REFRESHTOKEN_PRIVATE_KEY,
+    { expiresIn: env.JWT_EXPIRED_IN_REFRESHTOKEN }
   );
 
   res
-    .cookie("token", token, {
+    .cookie("accessToken", accessToken, {
+      maxAge: 1000 * 60 * 60 * 24,
       httpOnly: true,
     })
-    .send("Created Token");
+    .cookie("refreshToken", refreshToken, {
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+      httpOnly: true,
+    })
+    .json({
+      success: true,
+      message: "Token have been setted in cookie",
+    });
 });
 
 const getToken = asyncMiddleware(async (req, res, next) => {
   res.json({
     success: true,
-    cookies: req.cookies,
+    accessToken: req.cookies.accessToken,
+    refreshToken: req.cookies.refreshToken,
+  });
+});
+
+const refreshToken = asyncMiddleware(async (req, res, next) => {
+  const { refreshToken } = req.body;
+  const isValidRefreshToken = jwt.verify(
+    refreshToken,
+    env.JWT_REFRESHTOKEN_PRIVATE_KEY
+  );
+
+  if (isValidRefreshToken) {
+    const newAccessToken = jwt.sign(
+      { email: isValidRefreshToken.email },
+      env.JWT_ACCESSTOKEN_PRIVATE_KEY,
+      { expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN }
+    );
+    return res.status(201).json({
+      success: true,
+      accessToken: newAccessToken,
+    });
+  }
+
+  res.clearCookie("accessToken", "refreshToken");
+
+  res.status(401).json({
+    success: false,
+    message: "Refresh token have been expired",
   });
 });
 
@@ -145,4 +202,5 @@ module.exports = {
   checkEmailToken,
   setToken,
   getToken,
+  refreshToken,
 };

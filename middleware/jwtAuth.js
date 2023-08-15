@@ -13,14 +13,13 @@ const jwtAuth = (req, res, next) => {
 
   const token = tokenHeaders.split(" ")[1];
 
-  const user = jwt.verify(token, env.JWT_PRIVATE_KEY);
+  const user = jwt.verify(token, env.JWT_ACCESSTOKEN_PRIVATE_KEY);
   if (!user) {
     return res.status(401).json({
       success: false,
       message: "Unauthorize!",
     });
   }
-
   req.user = user;
   next();
 };

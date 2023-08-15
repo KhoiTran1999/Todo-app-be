@@ -9,8 +9,13 @@ exports.env = {
 
   MONGO_URI: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/todo-app",
 
-  JWT_PRIVATE_KEY: process.env.JWT_PRIVATE_KEY || "khoitran123",
-  JWT_EXPIRED_IN: process.env.JWT_EXPIRED_IN || "1d",
+  JWT_ACCESSTOKEN_PRIVATE_KEY:
+    process.env.JWT_ACCESSTOKEN_PRIVATE_KEY || "accessTokenKhoitran",
+  JWT_REFRESHTOKEN_PRIVATE_KEY:
+    process.env.JWT_REFRESHTOKEN_PRIVATE_KEY || "refreshTokenKhoitran",
+  JWT_EXPIRED_IN_ACCESSTOKEN: process.env.JWT_EXPIRED_IN_ACCESSTOKEN || "1d",
+  JWT_EXPIRED_IN_REFRESHTOKEN:
+    process.env.JWT_EXPIRED_IN_REFRESHTOKEN || "365d",
 
   EMAIL_CLIENT_ID:
     process.env.EMAIL_CLIENT_ID ||
