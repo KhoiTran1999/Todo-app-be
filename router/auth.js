@@ -24,4 +24,6 @@ router.get("/cookie/getToken", authController.getToken);
 
 router.post("/cookie/refreshToken", authController.refreshToken);
 
+router.delete("/cookie/clearToken", authController.clearToken);
+
 module.exports = router;

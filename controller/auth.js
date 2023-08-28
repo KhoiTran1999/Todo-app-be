@@ -57,11 +57,21 @@ const login = asyncMiddleware(async (req, res, next) => {
   );
 
   res
-    .cookie("accessToken", accessToken)
-    .cookie("refreshToken", refreshToken)
+    .cookie("accessToken", accessToken, {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+    })
+    .cookie("refreshToken", refreshToken, {
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+      httpOnly: true,
+    })
     .status(201)
     .json({
       success: true,
+      token: {
+        accessToken,
+        refreshToken,
+      },
     });
 });
 
@@ -85,12 +95,12 @@ const verifyEmail = asyncMiddleware(async (req, res, next) => {
     to: email,
     subject: "Verify Email",
     html: `<h2>Hi ${email},</h2>
-          <p>You recently requested to verify your email for your <strong>${email}</strong> account. <br>Click link below to verify your email. <strong>This Link is only valid for the next 1 minute.</strong></p>
+          <p>You recently requested to verify your email account. <br>Click link below to verify your email. <strong>This Link is only valid for the next 1 minute.</strong></p>
           <div style= "display: flex; justify-content: center; margin: 10px">
             <a href="${env.SERVER_URL}/api/v1/auth/checkEmailToken/${encodeToken}" style="background-color: rgb(34,188,102); color: white; font-size: 30px; padding: 4px; border-radius: 2px">Click here</a>
           </div>
           <p>Thanks,
-          <br>The KhoiTran Website Team</p>`,
+          <br>KhoiTran Todo-list Team</p>`,
   });
 
   res.status(201).json({
@@ -122,7 +132,7 @@ const checkEmailToken = asyncMiddleware(async (req, res, next) => {
   await registerToken.deleteOne({ email: user.email, token: decodeToken });
 
   res.redirect(
-    `http://localhost:3000/register/${encodeURIComponent(user.email)}`
+    `http://localhost:3000/register/${encodeURIComponent(decodeToken)}`
   );
 });
 
@@ -161,6 +171,15 @@ const setToken = asyncMiddleware(async (req, res, next) => {
 });
 
 const getToken = asyncMiddleware(async (req, res, next) => {
+  const accessToken = req.cookies.accessToken;
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!accessToken || !refreshToken) {
+    return res.status(404).json({
+      success: false,
+      message: "Token doesn't exist",
+    });
+  }
   res.json({
     success: true,
     accessToken: req.cookies.accessToken,
@@ -170,29 +189,46 @@ const getToken = asyncMiddleware(async (req, res, next) => {
 
 const refreshToken = asyncMiddleware(async (req, res, next) => {
   const { refreshToken } = req.body;
-  const isValidRefreshToken = jwt.verify(
-    refreshToken,
-    env.JWT_REFRESHTOKEN_PRIVATE_KEY
-  );
 
-  if (isValidRefreshToken) {
-    const newAccessToken = jwt.sign(
-      { email: isValidRefreshToken.email },
-      env.JWT_ACCESSTOKEN_PRIVATE_KEY,
-      { expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN }
+  try {
+    const isValidRefreshToken = jwt.verify(
+      refreshToken,
+      env.JWT_REFRESHTOKEN_PRIVATE_KEY
     );
-    return res.status(201).json({
-      success: true,
-      accessToken: newAccessToken,
+
+    if (isValidRefreshToken) {
+      const newAccessToken = jwt.sign(
+        { email: isValidRefreshToken.email },
+        env.JWT_ACCESSTOKEN_PRIVATE_KEY,
+        { expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN }
+      );
+      return res
+        .cookie("accessToken", newAccessToken, {
+          maxAge: 1000 * 60 * 60 * 24,
+          httpOnly: true,
+        })
+        .status(201)
+        .json({
+          success: true,
+          accessToken: newAccessToken,
+        });
+    }
+  } catch (error) {
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+
+    res.status(401).json({
+      success: false,
+      message: "Refresh token have been expired",
     });
   }
+});
 
-  res.clearCookie("accessToken", "refreshToken");
+const clearToken = asyncMiddleware(async (req, res, next) => {
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
 
-  res.status(401).json({
-    success: false,
-    message: "Refresh token have been expired",
-  });
+  res.json({ success: true });
 });
 
 module.exports = {
@@ -203,4 +239,5 @@ module.exports = {
   setToken,
   getToken,
   refreshToken,
+  clearToken,
 };

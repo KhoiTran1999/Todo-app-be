@@ -24,7 +24,7 @@ exports.env = {
     process.env.EMAIL_CLIENT_SECRET || "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",
   EMAIL_REFRESH_TOKEN:
     process.env.EMAIL_REFRESH_TOKEN ||
-    "1//04Stm96ITP0D_CgYIARAAGAQSNwF-L9Ir1HFd09Eom4Y6LU7eXgwfrdHQnYPnekF6pM7VeBNcfnfvaXKB3Sv-KZTbKA6RfpNpSls",
+    "1//04duHtsit9AnBCgYIARAAGAQSNwF-L9IrL_D2v72xU2By7KJqfjxld8iETsXdWhOA6MUvDNXTtsFJNpVHHr71gJ6XM20P7hkXVOI",
   EMAIL: process.env.EMAIL || "tranquockhoi1999@gmail.com",
 
   SERVER_URL: process.env.SERVER_URL || "http://localhost:3200",
