@@ -42,6 +42,7 @@ const login = asyncMiddleware(async (req, res, next) => {
 
   const accessToken = jwt.sign(
     {
+      id: user.id,
       email: user.email,
     },
     env.JWT_ACCESSTOKEN_PRIVATE_KEY,
@@ -50,6 +51,7 @@ const login = asyncMiddleware(async (req, res, next) => {
 
   const refreshToken = jwt.sign(
     {
+      id: user.id,
       email: user.email,
     },
     env.JWT_REFRESHTOKEN_PRIVATE_KEY,
@@ -136,40 +138,6 @@ const checkEmailToken = asyncMiddleware(async (req, res, next) => {
   );
 });
 
-const setToken = asyncMiddleware(async (req, res, next) => {
-  const { email } = req.body;
-
-  const accessToken = jwt.sign(
-    {
-      email,
-    },
-    env.JWT_ACCESSTOKEN_PRIVATE_KEY,
-    { expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN }
-  );
-
-  const refreshToken = jwt.sign(
-    {
-      email,
-    },
-    env.JWT_REFRESHTOKEN_PRIVATE_KEY,
-    { expiresIn: env.JWT_EXPIRED_IN_REFRESHTOKEN }
-  );
-
-  res
-    .cookie("accessToken", accessToken, {
-      maxAge: 1000 * 60 * 60 * 24,
-      httpOnly: true,
-    })
-    .cookie("refreshToken", refreshToken, {
-      maxAge: 1000 * 60 * 60 * 24 * 365,
-      httpOnly: true,
-    })
-    .json({
-      success: true,
-      message: "Token have been setted in cookie",
-    });
-});
-
 const getToken = asyncMiddleware(async (req, res, next) => {
   const accessToken = req.cookies.accessToken;
   const refreshToken = req.cookies.refreshToken;
@@ -191,14 +159,16 @@ const refreshToken = asyncMiddleware(async (req, res, next) => {
   const { refreshToken } = req.body;
 
   try {
-    const isValidRefreshToken = jwt.verify(
-      refreshToken,
-      env.JWT_REFRESHTOKEN_PRIVATE_KEY
-    );
+    const user = jwt.verify(refreshToken, env.JWT_REFRESHTOKEN_PRIVATE_KEY);
 
-    if (isValidRefreshToken) {
+    if (user) {
+      const user = await User.findOne({ where: { id: user.id } });
+      if (user) {
+        throw new ErrorResponse(409, "Invalid refreshToken");
+      }
+
       const newAccessToken = jwt.sign(
-        { email: isValidRefreshToken.email },
+        { id: user.id, email: user.email },
         env.JWT_ACCESSTOKEN_PRIVATE_KEY,
         { expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN }
       );
@@ -213,6 +183,9 @@ const refreshToken = asyncMiddleware(async (req, res, next) => {
           accessToken: newAccessToken,
         });
     }
+
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
   } catch (error) {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
@@ -236,7 +209,6 @@ module.exports = {
   login,
   verifyEmail,
   checkEmailToken,
-  setToken,
   getToken,
   refreshToken,
   clearToken,

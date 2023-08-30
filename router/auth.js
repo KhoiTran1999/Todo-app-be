@@ -2,28 +2,20 @@ const express = require("express");
 const router = express.Router();
 const validator = require("../middleware/validator");
 const { registerSchema, loginShema } = require("../validation/UserSchema");
-const authController = require("../controller/auth");
-const jwtAuth = require("../middleware/jwtAuth");
+const controller = require("../controller/auth");
 
-router.post(
-  "/register",
-  jwtAuth,
-  validator(registerSchema),
-  authController.register
-);
+router.post("/register", validator(registerSchema), controller.register);
 
-router.post("/login", validator(loginShema), authController.login);
+router.post("/login", validator(loginShema), controller.login);
 
-router.post("/verifyEmail", authController.verifyEmail);
+router.post("/verifyEmail", controller.verifyEmail);
 
-router.get("/checkEmailToken/:token", authController.checkEmailToken);
+router.get("/checkEmailToken/:token", controller.checkEmailToken);
 
-router.post("/cookie/setToken", authController.setToken);
+router.get("/cookie/getToken", controller.getToken);
 
-router.get("/cookie/getToken", authController.getToken);
+router.post("/cookie/refreshToken", controller.refreshToken);
 
-router.post("/cookie/refreshToken", authController.refreshToken);
-
-router.delete("/cookie/clearToken", authController.clearToken);
+router.delete("/cookie/clearToken", controller.clearToken);
 
 module.exports = router;

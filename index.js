@@ -5,6 +5,7 @@ const { env } = require("./config/env");
 const { connectMysql } = require("./database/mysql/connectMysql");
 const morgan = require("morgan");
 const authRouter = require("./router/auth");
+const todoRouter = require("./router/todo");
 const errorMiddleware = require("./middleware/errorMiddleware");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -26,6 +27,9 @@ connectMongo()
 
 //Auth API
 app.use("/api/v1/auth", authRouter);
+
+//Todo API
+app.use("/api/v1/todo", todoRouter);
 
 //Middleware
 app.use(errorMiddleware);
