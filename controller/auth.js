@@ -142,12 +142,21 @@ const getToken = asyncMiddleware(async (req, res, next) => {
   const accessToken = req.cookies.accessToken;
   const refreshToken = req.cookies.refreshToken;
 
-  if (!accessToken || !refreshToken) {
+  if (!refreshToken) {
     return res.status(404).json({
       success: false,
       message: "Token doesn't exist",
     });
   }
+
+  if (!accessToken) {
+    return res.json({
+      success: false,
+      message: "AccessToken have been expired",
+      refreshToken: req.cookies.refreshToken,
+    });
+  }
+
   res.json({
     success: true,
     accessToken: req.cookies.accessToken,
@@ -156,45 +165,23 @@ const getToken = asyncMiddleware(async (req, res, next) => {
 });
 
 const refreshToken = asyncMiddleware(async (req, res, next) => {
-  const { refreshToken } = req.body;
+  const user = req.user;
+  const newAccessToken = jwt.sign(
+    { id: user.id, email: user.email },
+    env.JWT_ACCESSTOKEN_PRIVATE_KEY,
+    { expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN }
+  );
 
-  try {
-    const user = jwt.verify(refreshToken, env.JWT_REFRESHTOKEN_PRIVATE_KEY);
-
-    if (user) {
-      const user = await User.findOne({ where: { id: user.id } });
-      if (user) {
-        throw new ErrorResponse(409, "Invalid refreshToken");
-      }
-
-      const newAccessToken = jwt.sign(
-        { id: user.id, email: user.email },
-        env.JWT_ACCESSTOKEN_PRIVATE_KEY,
-        { expiresIn: env.JWT_EXPIRED_IN_ACCESSTOKEN }
-      );
-      return res
-        .cookie("accessToken", newAccessToken, {
-          maxAge: 1000 * 60 * 60 * 24,
-          httpOnly: true,
-        })
-        .status(201)
-        .json({
-          success: true,
-          accessToken: newAccessToken,
-        });
-    }
-
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-  } catch (error) {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-
-    res.status(401).json({
-      success: false,
-      message: "Refresh token have been expired",
+  return res
+    .cookie("accessToken", newAccessToken, {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+    })
+    .status(201)
+    .json({
+      success: true,
+      accessToken: newAccessToken,
     });
-  }
 });
 
 const clearToken = asyncMiddleware(async (req, res, next) => {

@@ -12,13 +12,7 @@ const getTodo = asyncMiddleware(async (req, res, next) => {
 });
 
 const addTodo = asyncMiddleware(async (req, res, next) => {
-  const {
-    title,
-    content,
-    pin = false,
-    reminder = null,
-    color = "white",
-  } = req.body;
+  const { title, content, pin = false, reminder = null, color } = req.body;
   const { id: userId } = req.user;
 
   await Todo.create({ title, content, pin, reminder, color, userId });
