@@ -1,18 +1,18 @@
-const validator = (schema, property = "body") => {
-  return (req, res, next) => {
-    const { err } = schema.validate(req[property]);
+const validator =
+  (schema, property = "body") =>
+  (req, res, next) => {
+    const { error } = schema.validate(req[property]);
 
-    if (!err) return next();
+    if (!error) return next();
 
-    const { details } = err;
-    const error = details[0].message;
+    const { details } = error;
+    const message = details[0].message;
     const path = details[0].path[0];
 
     res.status(422).json({
       success: false,
-      message: { error, path },
+      error: { message, path },
     });
   };
-};
 
 module.exports = validator;

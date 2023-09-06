@@ -12,7 +12,7 @@ const sequelize = new Sequelize(
 );
 
 const connectMysql = async () => {
-  await sequelize.sync({ logging: false, alter: true });
+  await sequelize.sync({ logging: false, alter: false });
   console.log("Mysql database have been connected");
 };
 

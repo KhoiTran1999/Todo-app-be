@@ -1,4 +1,5 @@
 require("dotenv").config();
+require("./model/Mysql/relationship");
 const express = require("express");
 const app = express();
 const { env } = require("./config/env");
@@ -6,10 +7,12 @@ const { connectMysql } = require("./database/mysql/connectMysql");
 const morgan = require("morgan");
 const authRouter = require("./router/auth");
 const todoRouter = require("./router/todo");
+const labelRouter = require("./router/label");
 const errorMiddleware = require("./middleware/errorMiddleware");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const connectMongo = require("./database/mongo/connectMongo");
+const jwtAuth = require("./middleware/jwtAuth");
 
 //Middleware
 app.use(express.json());
@@ -29,7 +32,10 @@ connectMongo()
 app.use("/api/v1/auth", authRouter);
 
 //Todo API
-app.use("/api/v1/todo", todoRouter);
+app.use("/api/v1/todo", jwtAuth, todoRouter);
+
+//Label API
+app.use("/api/v1/label", jwtAuth, labelRouter);
 
 //Middleware
 app.use(errorMiddleware);

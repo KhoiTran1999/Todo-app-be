@@ -52,7 +52,6 @@ const updateTodo = asyncMiddleware(async (req, res, next) => {
     { title, content, pin, reminder, color },
     { where: { id, userId } }
   );
-
   res.json({ success: true, message: "Updated todo successfuly" });
 });
 
