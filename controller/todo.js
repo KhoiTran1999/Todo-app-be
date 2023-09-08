@@ -3,11 +3,40 @@ const Todo = require("../model/Mysql/Todo");
 
 const getTodo = asyncMiddleware(async (req, res, next) => {
   const user = req.user;
-  const todoList = await Todo.findAll({ where: { userId: user.id } });
+  const todoList = await Todo.findAll({
+    where: { archive: false, userId: user.id },
+  });
 
   res.json({
     success: true,
     data: todoList,
+  });
+});
+
+const getArchiveTodo = asyncMiddleware(async (req, res, next) => {
+  const user = req.user;
+  const todoList = await Todo.findAll({
+    where: { archive: true, userId: user.id },
+  });
+
+  res.json({
+    success: true,
+    data: todoList,
+  });
+});
+
+const getDeletedTodo = asyncMiddleware(async (req, res, next) => {
+  const user = req.user;
+  const todoList = await Todo.findAll({
+    where: { userId: user.id },
+    paranoid: false,
+  });
+
+  const deletedTodoList = todoList.filter((val) => !!val.deletedAt);
+
+  res.json({
+    success: true,
+    data: deletedTodoList,
   });
 });
 
@@ -34,9 +63,18 @@ const deleteTodo = asyncMiddleware(async (req, res, next) => {
   res.json({ success: true, message: "Deleted todo successfully" });
 });
 
+const deleteTodoPermanently = asyncMiddleware(async (req, res, next) => {
+  const { id } = req.params;
+  const { id: userId } = req.user;
+
+  await Todo.destroy({ where: { id, userId }, force: true });
+
+  res.json({ success: true, message: "permanently Deleted todo successfully" });
+});
+
 const updateTodo = asyncMiddleware(async (req, res, next) => {
   const { id } = req.params;
-  const { title, content, pin, reminder, color } = req.body;
+  const { title, content, pin, reminder, color, archive } = req.body;
   const { id: userId } = req.user;
 
   const todo = await Todo.findByPk(id);
@@ -49,10 +87,39 @@ const updateTodo = asyncMiddleware(async (req, res, next) => {
   }
 
   await Todo.update(
-    { title, content, pin, reminder, color },
+    { title, content, pin, reminder, color, archive },
     { where: { id, userId } }
   );
   res.json({ success: true, message: "Updated todo successfuly" });
 });
 
-module.exports = { getTodo, addTodo, deleteTodo, updateTodo };
+const restoreTodo = asyncMiddleware(async (req, res, next) => {
+  const { id } = req.params;
+  const { id: userId } = req.user;
+
+  await Todo.restore({ where: { id, userId } });
+
+  const todoList = await Todo.findAll({
+    where: { userId },
+    paranoid: false,
+  });
+
+  const deletedTodoList = todoList.filter((val) => !!val.deletedAt);
+
+  res.json({
+    success: true,
+    data: deletedTodoList,
+    message: "Restore todo successfuly",
+  });
+});
+
+module.exports = {
+  getTodo,
+  getArchiveTodo,
+  getDeletedTodo,
+  addTodo,
+  deleteTodo,
+  deleteTodoPermanently,
+  updateTodo,
+  restoreTodo,
+};

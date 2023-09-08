@@ -30,6 +30,11 @@ const Todo = sequelize.define(
       defaultValue: "white",
       allowNull: false,
     },
+    archive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,

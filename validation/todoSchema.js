@@ -5,6 +5,7 @@ const content = Joi.string().min(1).max(20000);
 const pin = Joi.boolean();
 const reminder = Joi.date().allow(null);
 const color = Joi.string();
+const archive = Joi.boolean();
 
 const addTodoSchema = Joi.object({
   title,
@@ -12,6 +13,7 @@ const addTodoSchema = Joi.object({
   pin,
   reminder,
   color,
+  archive,
 });
 
 const udpateTodoSchema = Joi.object({
@@ -20,6 +22,7 @@ const udpateTodoSchema = Joi.object({
   pin,
   reminder,
   color,
+  archive,
 });
 
 module.exports = { addTodoSchema, udpateTodoSchema };
