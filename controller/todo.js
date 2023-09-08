@@ -40,6 +40,18 @@ const getDeletedTodo = asyncMiddleware(async (req, res, next) => {
   });
 });
 
+const getAllTodo = asyncMiddleware(async (req, res, next) => {
+  const user = req.user;
+  const todoList = await Todo.findAll({
+    where: { userId: user.id },
+  });
+
+  res.json({
+    success: true,
+    data: todoList,
+  });
+});
+
 const addTodo = asyncMiddleware(async (req, res, next) => {
   const { title, content, pin = false, reminder = null, color } = req.body;
   const { id: userId } = req.user;
@@ -117,6 +129,7 @@ module.exports = {
   getTodo,
   getArchiveTodo,
   getDeletedTodo,
+  getAllTodo,
   addTodo,
   deleteTodo,
   deleteTodoPermanently,
