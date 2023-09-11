@@ -108,7 +108,6 @@ const deleteTodoLabel = asyncMiddleware(async (req, res, next) => {
 
   const todo = await Todo.findOne({ where: { id: todoId, userId: user.id } });
   if (!todo) {
-    console.log("vo day");
     throw new ErrorResponse(401, "Unauthorize");
   }
 
@@ -120,7 +119,7 @@ const deleteTodoLabel = asyncMiddleware(async (req, res, next) => {
     throw new ErrorResponse(401, "Unauthorize");
   }
 
-  const result = await Todo_Label.destroy({
+  await Todo_Label.destroy({
     where: { todoId, labelId, userId: user.id },
   });
 
