@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const { env } = require("../config/env");
 
 const refreshJwtAuth = (req, res, next) => {
-  console.log(req.headers);
   const tokenHeaders = req.headers.authorization;
   if (!tokenHeaders || !tokenHeaders.startsWith("Bearer ")) {
     return res.status(401).json({

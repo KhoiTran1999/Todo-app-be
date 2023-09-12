@@ -30,15 +30,15 @@ connectMongo()
   .catch((err) => console.log(err));
 
 //Auth API
-app.use("/api/v1/auth", rateLimiter(1 * 60 * 1000, 1000), authRouter);
+app.use("/api/v1/auth", authRouter);
 
 //Todo API
-app.use("/api/v1/todo", rateLimiter(1 * 60 * 1000, 1000), jwtAuth, todoRouter);
+app.use("/api/v1/todo", rateLimiter(1 * 60 * 1000, 10000), jwtAuth, todoRouter);
 
 //Label API
 app.use(
   "/api/v1/label",
-  rateLimiter(1 * 60 * 1000, 1000),
+  rateLimiter(1 * 60 * 1000, 10000),
   jwtAuth,
   labelRouter
 );
