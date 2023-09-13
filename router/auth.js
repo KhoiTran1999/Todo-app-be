@@ -10,14 +10,14 @@ router.post("/register", validator(registerSchema), controller.register);
 
 router.post(
   "/login",
-  rateLimiter(1 * 60 * 1000, 3),
+  rateLimiter(2 * 60 * 1000, 5),
   validator(loginShema),
   controller.login
 );
 
 router.post(
   "/verifyEmail",
-  rateLimiter(1 * 60 * 1000, 20),
+  rateLimiter(2 * 60 * 1000, 10),
   controller.verifyEmail
 );
 

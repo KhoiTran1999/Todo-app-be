@@ -14,6 +14,8 @@ router.get("/restore/:id", controller.restoreTodo);
 
 router.get("/all", controller.getAllTodo);
 
+router.get("/search", controller.getSearchTodo);
+
 router.post("/", validator(addTodoSchema), controller.addTodo);
 
 router.delete("/:id", controller.deleteTodo);

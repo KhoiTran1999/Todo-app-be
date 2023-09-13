@@ -14,9 +14,7 @@ const rateLimiter = (windowMs = 1 * 60 * 1000, max) => {
     max,
     standardHeaders: true,
     legacyHeaders: false,
-    message: `Too many requrests from this IP, please try again after ${
-      windowMs / 1000 / 60
-    } minute`,
+    message: `Too many requrests from this IP, please try later`,
     handler: (req, res, next, option) => {
       res.status(option.statusCode).json({
         success: false,

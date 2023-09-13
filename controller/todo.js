@@ -1,34 +1,59 @@
 const asyncMiddleware = require("../middleware/asyncMiddleware");
 const Todo = require("../model/Mysql/Todo");
+const { Op } = require("sequelize");
 
 const getTodo = asyncMiddleware(async (req, res, next) => {
   const user = req.user;
-  const todoList = await Todo.findAll({
-    where: { archive: false, userId: user.id },
+  const { limit } = req.query;
+
+  const pinTodoList = await Todo.findAll({
+    where: { pin: true, archive: false, userId: user.id },
+    order: [["id", "DESC"]],
   });
+
+  const todoList = await Todo.findAll({
+    where: { pin: false, archive: false, userId: user.id },
+    order: [["id", "DESC"]],
+    limit: Number(limit),
+  });
+
+  const allTodoList = [...pinTodoList, ...todoList];
 
   res.json({
     success: true,
-    data: todoList,
+    data: allTodoList,
   });
 });
 
 const getArchiveTodo = asyncMiddleware(async (req, res, next) => {
   const user = req.user;
-  const todoList = await Todo.findAll({
-    where: { archive: true, userId: user.id },
+  const { limit } = req.query;
+
+  const pinTodoList = await Todo.findAll({
+    where: { pin: true, archive: true, userId: user.id },
+    order: [["id", "DESC"]],
   });
+
+  const todoList = await Todo.findAll({
+    where: { pin: false, archive: true, userId: user.id },
+    order: [["id", "DESC"]],
+    limit: Number(limit),
+  });
+
+  const allTodoList = [...pinTodoList, ...todoList];
 
   res.json({
     success: true,
-    data: todoList,
+    data: allTodoList,
   });
 });
 
 const getDeletedTodo = asyncMiddleware(async (req, res, next) => {
   const user = req.user;
+
   const todoList = await Todo.findAll({
     where: { userId: user.id },
+    order: [["id", "DESC"]],
     paranoid: false,
   });
 
@@ -42,8 +67,37 @@ const getDeletedTodo = asyncMiddleware(async (req, res, next) => {
 
 const getAllTodo = asyncMiddleware(async (req, res, next) => {
   const user = req.user;
+  const { limit } = req.query;
+
   const todoList = await Todo.findAll({
     where: { userId: user.id },
+    order: [["id", "DESC"]],
+    limit: Number(limit),
+  });
+
+  res.json({
+    success: true,
+    data: todoList,
+  });
+});
+
+const getSearchTodo = asyncMiddleware(async (req, res, next) => {
+  const value = req.query.value;
+  const { limit } = req.query;
+
+  const todoList = await Todo.findAll({
+    where: {
+      [Op.or]: [
+        {
+          title: { [Op.substring]: `%${value}%` },
+        },
+        {
+          content: { [Op.substring]: `%${value}%` },
+        },
+      ],
+    },
+    order: [["id", "DESC"]],
+    limit: Number(limit),
   });
 
   res.json({
@@ -57,7 +111,10 @@ const addTodo = asyncMiddleware(async (req, res, next) => {
   const { id: userId } = req.user;
 
   await Todo.create({ title, content, pin, reminder, color, userId });
-  const newTodoList = await Todo.findAll({ where: { userId } });
+  const newTodoList = await Todo.findAll({
+    where: { userId },
+    order: [["id", "DESC"]],
+  });
 
   res.status(201).json({
     success: true,
@@ -113,6 +170,7 @@ const restoreTodo = asyncMiddleware(async (req, res, next) => {
 
   const todoList = await Todo.findAll({
     where: { userId },
+    order: [["id", "DESC"]],
     paranoid: false,
   });
 
@@ -130,6 +188,7 @@ module.exports = {
   getArchiveTodo,
   getDeletedTodo,
   getAllTodo,
+  getSearchTodo,
   addTodo,
   deleteTodo,
   deleteTodoPermanently,

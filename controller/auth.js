@@ -150,7 +150,7 @@ const getToken = asyncMiddleware(async (req, res, next) => {
   }
 
   if (!accessToken) {
-    return res.json({
+    return res.status(401).json({
       success: false,
       message: "AccessToken have been expired",
       refreshToken: req.cookies.refreshToken,
