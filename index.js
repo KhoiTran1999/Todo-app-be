@@ -13,7 +13,6 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const connectMongo = require("./database/mongo/connectMongo");
 const jwtAuth = require("./middleware/jwtAuth");
-const rateLimiter = require("./middleware/limiter");
 
 //Middleware
 app.use(express.json());
@@ -33,15 +32,10 @@ connectMongo()
 app.use("/api/v1/auth", authRouter);
 
 //Todo API
-app.use("/api/v1/todo", rateLimiter(1 * 60 * 1000, 10000), jwtAuth, todoRouter);
+app.use("/api/v1/todo", jwtAuth, todoRouter);
 
 //Label API
-app.use(
-  "/api/v1/label",
-  rateLimiter(1 * 60 * 1000, 10000),
-  jwtAuth,
-  labelRouter
-);
+app.use("/api/v1/label", jwtAuth, labelRouter);
 
 //Middleware
 app.use(errorMiddleware);

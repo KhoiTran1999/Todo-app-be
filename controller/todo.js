@@ -27,7 +27,6 @@ const getTodo = asyncMiddleware(async (req, res, next) => {
 
 const getArchiveTodo = asyncMiddleware(async (req, res, next) => {
   const user = req.user;
-  const { limit } = req.query;
 
   const pinTodoList = await Todo.findAll({
     where: { pin: true, archive: true, userId: user.id },
@@ -37,7 +36,6 @@ const getArchiveTodo = asyncMiddleware(async (req, res, next) => {
   const todoList = await Todo.findAll({
     where: { pin: false, archive: true, userId: user.id },
     order: [["id", "DESC"]],
-    limit: Number(limit),
   });
 
   const allTodoList = [...pinTodoList, ...todoList];
@@ -83,7 +81,6 @@ const getAllTodo = asyncMiddleware(async (req, res, next) => {
 
 const getSearchTodo = asyncMiddleware(async (req, res, next) => {
   const value = req.query.value;
-  const { limit } = req.query;
 
   const todoList = await Todo.findAll({
     where: {
@@ -97,7 +94,6 @@ const getSearchTodo = asyncMiddleware(async (req, res, next) => {
       ],
     },
     order: [["id", "DESC"]],
-    limit: Number(limit),
   });
 
   res.json({
