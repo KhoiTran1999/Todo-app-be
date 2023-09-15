@@ -12,7 +12,7 @@ const register = asyncMiddleware(async (req, res, next) => {
 
   const user = await User.findOne({ where: { email } });
   if (user) {
-    throw new ErrorResponse(409, "Invalid email");
+    throw new ErrorResponse(409, "This email have been registerd");
   }
 
   const hashPassword = bcrypt.hashSync(password, 12);
@@ -82,7 +82,7 @@ const verifyEmail = asyncMiddleware(async (req, res, next) => {
 
   const user = await User.findOne({ where: { email } });
   if (user) {
-    throw new ErrorResponse(409, "Invalid email");
+    throw new ErrorResponse(409, "Email have been used by another user");
   }
 
   const token = jwt.sign({ email }, env.JWT_ACCESSTOKEN_PRIVATE_KEY, {
@@ -91,18 +91,25 @@ const verifyEmail = asyncMiddleware(async (req, res, next) => {
 
   const encodeToken = encodeURIComponent(token);
 
-  await registerToken.create({ email, token });
+  try {
+    await registerToken.create({ email, token });
+  } catch (error) {
+    throw new ErrorResponse(
+      409,
+      "An email have been sent to your email. Please check it"
+    );
+  }
 
   await mail.sendMail({
     to: email,
-    subject: "Verify Email",
+    subject: "Fast Note - Verify Email",
     html: `<h2>Hi ${email},</h2>
-          <p>You recently requested to verify your email account. <br>Click link below to verify your email. <strong>This Link is only valid for the next 1 minute.</strong></p>
+          <p>You requested to verify your email account recently. <br>Click the link below to verify your email. <strong>This Link is only valid for the next 1 minute.</strong></p>
           <div style= "display: flex; justify-content: center; margin: 10px">
             <a href="${env.SERVER_URL}/api/v1/auth/checkEmailToken/${encodeToken}" style="background-color: rgb(34,188,102); color: white; font-size: 30px; padding: 4px; border-radius: 2px">Click here</a>
           </div>
           <p>Thanks,
-          <br>KhoiTran Todo-list Team</p>`,
+          <br>Fast Note Team</p>`,
   });
 
   res.status(201).json({
@@ -133,9 +140,7 @@ const checkEmailToken = asyncMiddleware(async (req, res, next) => {
 
   await registerToken.deleteOne({ email: user.email, token: decodeToken });
 
-  res.redirect(
-    `http://localhost:3000/register/${encodeURIComponent(decodeToken)}`
-  );
+  res.redirect(`${env.CLIENT_URL}/register/${encodeURIComponent(decodeToken)}`);
 });
 
 const getToken = asyncMiddleware(async (req, res, next) => {
