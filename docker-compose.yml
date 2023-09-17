@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql/mysql-server:latest
+    container_name: todo-mysql
+    environment:
+      MYSQL_HOST_DOCKER: host.docker.internal
+      MYSQL_DATABASE: todo-app
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: khoitran990120
+    ports:
+      - '3306:3306'
+    volumes:
+      - /var/lib/mysql_data:/var/lib/mysql
+  mongodb:
+    image: mongodb:latest
+    container_name: todo-mongodb
+    environment:
+      MONGO_URI_DOCKER: mongodb://host.docker.internal:27017/todo-app,
+    ports:
+      - '27017:27017'
+    volumes:
+      - /var/lib/mongodb_data:/data/db
+  backend:
+    build: .
+    container_name: todo-backend
+    ports:
+      - '3200:3200'
+    depends_on:
+      - mysql
+      - mongodb

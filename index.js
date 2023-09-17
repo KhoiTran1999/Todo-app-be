@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 require("./model/Mysql/relationship");
 const express = require("express");
 const app = express();
