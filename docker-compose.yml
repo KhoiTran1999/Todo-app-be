@@ -1,23 +1,30 @@
 version: '3.8'
 
+networks:
+  todo-networks:
+    driver: bridge
 services:
   mysql:
     image: mysql/mysql-server:latest
     container_name: todo-mysql
+    networks:
+      - todo-networks
+    restart: always
     environment:
-      MYSQL_HOST_DOCKER: host.docker.internal
-      MYSQL_DATABASE: todo-app
+      MYSQL_DIALECT: mysql
+      MYSQL_DATABASE: mysql
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: khoitran990120
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: khoitran990120
     ports:
-      - '3306:3306'
-    volumes:
-      - /var/lib/mysql_data:/var/lib/mysql
-  mongodb:
-    image: mongodb:latest
+      - '3307:3306'
+  mongo:
+    image: mongo:latest
     container_name: todo-mongodb
-    environment:
-      MONGO_URI_DOCKER: mongodb://host.docker.internal:27017/todo-app,
+    networks:
+      - todo-networks
+    restart: always
     ports:
       - '27017:27017'
     volumes:
@@ -25,8 +32,17 @@ services:
   backend:
     build: .
     container_name: todo-backend
+    networks:
+      - todo-networks
+    restart: always
+    environment:
+      MYSQL_HOST: mysql
+      MONGO_URI: mongodb://mongo:27017/todo-app
     ports:
       - '3200:3200'
     depends_on:
       - mysql
-      - mongodb
+      - mongo
+    links:
+      - mysql
+      - mongo

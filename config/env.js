@@ -10,9 +10,6 @@ exports.env = {
   MYSQL_DIALECT: process.env.MYSQL_DIALECT || "mysql",
 
   MONGO_URI: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/todo-app",
-  MONGO_URI_DOCKER:
-    process.env.MONGO_URI_DOCKER ||
-    "mongodb://host.docker.internal:27017/todo-app",
 
   JWT_ACCESSTOKEN_PRIVATE_KEY:
     process.env.JWT_ACCESSTOKEN_PRIVATE_KEY || "accessTokenKhoitran",

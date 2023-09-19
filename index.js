@@ -17,7 +17,7 @@ const jwtAuth = require("./middleware/jwtAuth");
 //Middleware
 app.use(express.json());
 app.use(morgan("short"));
-app.use(cors({ credentials: true, origin: env.CLIENT_URL }));
+app.use(cors({ credentials: true, origin: "*" }));
 app.use(cookieParser());
 
 //Connect Mysql database
