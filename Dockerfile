@@ -9,6 +9,6 @@ RUN npm install sequelize-cli
 
 COPY . .
 
-EXPOSE 3200
+EXPOSE 80
 
 CMD ["npm", "run", "start-prod"]

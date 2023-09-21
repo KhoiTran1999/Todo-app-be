@@ -17,7 +17,16 @@ const jwtAuth = require("./middleware/jwtAuth");
 //Middleware
 app.use(express.json());
 app.use(morgan("short"));
-app.use(cors({ credentials: true, origin: "*" }));
+app.use(
+  cors({
+    origin:
+      env.NODE_ENV === "prod"
+        ? "https://fastnote-two.vercel.app"
+        : "http://localhost:3000",
+    methods: ["GET", "PATCH", "POST", "DELETE"],
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 
 //Connect Mysql database
