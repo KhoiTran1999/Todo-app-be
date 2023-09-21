@@ -20,7 +20,7 @@ app.use(morgan("short"));
 app.use(
   cors({
     origin:
-      env.NODE_ENV === "prod"
+      env.NODE_ENV === "production"
         ? "https://fastnote-two.vercel.app"
         : "http://localhost:3000",
     methods: ["GET", "PATCH", "POST", "DELETE"],
