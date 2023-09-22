@@ -39,7 +39,7 @@ services:
       MYSQL_HOST: mysql
       MONGO_URI: mongodb://mongo:27017/todo-app
     ports:
-      - '80:80'
+      - '443:443'
     depends_on:
       - mysql
       - mongo

@@ -10,7 +10,7 @@ router.post("/register", validator(registerSchema), controller.register);
 
 router.post(
   "/login",
-  rateLimiter(2 * 60 * 1000, 5),
+  rateLimiter(2 * 60 * 1000, 10),
   validator(loginShema),
   controller.login
 );

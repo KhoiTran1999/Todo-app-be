@@ -60,16 +60,12 @@ const login = asyncMiddleware(async (req, res, next) => {
 
   res
     .cookie("accessToken", accessToken, {
-      maxAge: 1000 * 60 * 60 * 24,
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
       httpOnly: true,
-      secure: true,
-      
     })
     .cookie("refreshToken", refreshToken, {
-      maxAge: 1000 * 60 * 60 * 24 * 365,
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
       httpOnly: true,
-      secure: true,
-      
     })
     .status(201)
     .json({
@@ -183,10 +179,8 @@ const refreshToken = asyncMiddleware(async (req, res, next) => {
 
   return res
     .cookie("accessToken", newAccessToken, {
-      maxAge: 1000 * 60 * 60 * 24,
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
       httpOnly: true,
-      secure: true,
-      
     })
     .status(201)
     .json({
@@ -196,8 +190,8 @@ const refreshToken = asyncMiddleware(async (req, res, next) => {
 });
 
 const clearToken = asyncMiddleware(async (req, res, next) => {
-  res.clearCookie("accessToken", { secure: true });
-  res.clearCookie("refreshToken", { secure: true});
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
 
   res.json({ success: true });
 });

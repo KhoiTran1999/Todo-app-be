@@ -108,7 +108,7 @@ const addTodo = asyncMiddleware(async (req, res, next) => {
 
   await Todo.create({ title, content, pin, reminder, color, userId });
   const newTodoList = await Todo.findAll({
-    where: { userId },
+    where: { userId, archive: false },
     order: [["id", "DESC"]],
   });
 

@@ -71,7 +71,7 @@ const getTodoLabel = asyncMiddleware(async (req, res, next) => {
     include: [Todo],
   });
 
-  const todoList = todo_label.map((val) => val.Todo);
+  const todoList = todo_label.filter((val) => !!val.Todo);
   res.json({
     success: true,
     data: todoList,

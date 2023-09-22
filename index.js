@@ -16,19 +16,17 @@ const jwtAuth = require("./middleware/jwtAuth");
 
 //Middleware
 app.use(express.json());
-app.use(morgan("short"));
 app.use(
   cors({
     origin:
       env.NODE_ENV === "production"
-        ? "https://fastnote-two.vercel.app"
+        ? "https://api.fastnote.click"
         : "http://localhost:3000",
     methods: ["GET", "PATCH", "POST", "DELETE"],
     credentials: true,
   })
 );
 app.use(cookieParser());
-
 //Connect Mysql database
 connectMysql().catch((err) => console.log(err));
 
@@ -38,7 +36,7 @@ connectMongo()
   .catch((err) => console.log(err));
 
 //Auth API
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/auth", morgan("short"), authRouter);
 
 //Todo API
 app.use("/api/v1/todo", jwtAuth, todoRouter);

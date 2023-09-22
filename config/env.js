@@ -1,7 +1,7 @@
 exports.env = {
   NODE_ENV: process.env.NODE_ENV || "dev",
 
-  PORT: process.env.PORT || 80,
+  PORT: process.env.PORT || 3200,
 
   MYSQL_DATABASE: process.env.MYSQL_DATABASE || "todo-app",
   MYSQL_USERNAME: process.env.MYSQL_USERNAME || "root",
