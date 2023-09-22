@@ -20,7 +20,7 @@ app.use(
   cors({
     origin:
       env.NODE_ENV === "production"
-        ? "https://api.fastnote.click"
+        ? "https://fastnote.click"
         : "http://localhost:3000",
     methods: ["GET", "PATCH", "POST", "DELETE"],
     credentials: true,
