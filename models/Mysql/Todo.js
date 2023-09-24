@@ -1,9 +1,9 @@
-const { sequelize } = require("../../database/mysql/connectMysql");
-const { DataTypes } = require("sequelize");
-const User = require("./User");
+const { sequelize } = require('../../database/mysql/connectMysql');
+const { DataTypes } = require('sequelize');
+const User = require('./User');
 
 const Todo = sequelize.define(
-  "Todo",
+  'Todo',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -11,10 +11,10 @@ const Todo = sequelize.define(
       primaryKey: true,
     },
     title: {
-      type: DataTypes.TEXT("long"),
+      type: DataTypes.TEXT('long'),
     },
     content: {
-      type: DataTypes.TEXT("long"),
+      type: DataTypes.TEXT('long'),
       allowNull: false,
     },
     pin: {
@@ -27,7 +27,7 @@ const Todo = sequelize.define(
     },
     color: {
       type: DataTypes.STRING,
-      defaultValue: "white",
+      defaultValue: 'white',
       allowNull: false,
     },
     archive: {
@@ -40,11 +40,11 @@ const Todo = sequelize.define(
       allowNull: false,
       references: {
         model: User,
-        key: "id",
+        key: 'id',
       },
     },
   },
-  { paranoid: true }
+  { paranoid: true },
 );
 
 module.exports = Todo;

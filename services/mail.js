@@ -1,6 +1,6 @@
-const nodemailer = require("nodemailer");
-const generateOAuth2AccessToken = require("../utiles/generateOAuth2AccessToken");
-const { env } = require("../config/env");
+const nodemailer = require('nodemailer');
+const generateOAuth2AccessToken = require('../utiles/generateOAuth2AccessToken');
+const { env } = require('../config/env');
 
 class EmailService {
   constructor() {
@@ -8,9 +8,9 @@ class EmailService {
   }
   initTransporter() {
     this.transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: 'gmail',
       auth: {
-        type: "OAuth2",
+        type: 'OAuth2',
         clientId: env.EMAIL_CLIENT_ID,
         clientSecret: env.EMAIL_CLIENT_SECRET,
       },
@@ -20,7 +20,7 @@ class EmailService {
   async sendMail({ to, subject, text, html }) {
     const accessToken = await generateOAuth2AccessToken();
     this.transporter.sendMail({
-      from: "KhoiTran - TodoApp",
+      from: 'KhoiTran - TodoApp',
       to,
       subject,
       text,

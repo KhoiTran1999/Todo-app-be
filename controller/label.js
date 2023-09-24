@@ -1,8 +1,8 @@
-const asyncMiddleware = require("../middleware/asyncMiddleware");
-const Label = require("../model/Mysql/Label");
-const Todo = require("../model/Mysql/Todo");
-const Todo_Label = require("../model/Mysql/Todo_Label");
-const ErrorResponse = require("../responses/ErrorResponse");
+const asyncMiddleware = require('../middleware/asyncMiddleware');
+const Label = require('../models/Mysql/Label');
+const Todo = require('../models/Mysql/Todo');
+const Todo_Label = require('../models/Mysql/Todo_Label');
+const ErrorResponse = require('../responses/ErrorResponse');
 
 const getLabel = asyncMiddleware(async (req, res, next) => {
   const user = req.user;
@@ -24,7 +24,7 @@ const addLabel = asyncMiddleware(async (req, res, next) => {
   res.status(201).json({
     success: true,
     data: newLabelList,
-    message: "Created label successfully",
+    message: 'Created label successfully',
   });
 });
 
@@ -40,7 +40,7 @@ const deleteLabel = asyncMiddleware(async (req, res, next) => {
   res.json({
     success: true,
     data: newLabelList,
-    message: "Deleted label successfuly",
+    message: 'Deleted label successfuly',
   });
 });
 
@@ -56,7 +56,7 @@ const updateLabel = asyncMiddleware(async (req, res, next) => {
   res.json({
     success: true,
     data: newLabelList,
-    message: "Updated label successfuly",
+    message: 'Updated label successfuly',
   });
 });
 
@@ -71,7 +71,11 @@ const getTodoLabel = asyncMiddleware(async (req, res, next) => {
     include: [Todo],
   });
 
-  const todoList = todo_label.filter((val) => !!val.Todo);
+  const todoList = todo_label.reduce((acc, val) => {
+    if (val.dataValues.Todo) return [...acc, val.dataValues.Todo.dataValues];
+    return acc;
+  }, []);
+
   res.json({
     success: true,
     data: todoList,
@@ -84,21 +88,21 @@ const addTodoLabel = asyncMiddleware(async (req, res, next) => {
 
   const todo = await Todo.findOne({ where: { id: todoId, userId: user.id } });
   if (!todo) {
-    throw new ErrorResponse(401, "Unauthorize");
+    throw new ErrorResponse(401, 'Unauthorize');
   }
 
   const label = await Label.findOne({
     where: { id: labelId, userId: user.id },
   });
   if (!label) {
-    throw new ErrorResponse(401, "Unauthorize");
+    throw new ErrorResponse(401, 'Unauthorize');
   }
 
   await Todo_Label.create({ todoId, labelId, userId: user.id });
 
   res.status(201).json({
     success: true,
-    message: "Add todo-label successfuly",
+    message: 'Add todo-label successfuly',
   });
 });
 
@@ -108,7 +112,7 @@ const deleteTodoLabel = asyncMiddleware(async (req, res, next) => {
 
   const todo = await Todo.findOne({ where: { id: todoId, userId: user.id } });
   if (!todo) {
-    throw new ErrorResponse(401, "Unauthorize");
+    throw new ErrorResponse(401, 'Unauthorize');
   }
 
   const label = await Label.findOne({
@@ -116,7 +120,7 @@ const deleteTodoLabel = asyncMiddleware(async (req, res, next) => {
   });
 
   if (!label) {
-    throw new ErrorResponse(401, "Unauthorize");
+    throw new ErrorResponse(401, 'Unauthorize');
   }
 
   await Todo_Label.destroy({
@@ -125,7 +129,7 @@ const deleteTodoLabel = asyncMiddleware(async (req, res, next) => {
 
   res.json({
     success: true,
-    message: "Delete todo-label successfuly",
+    message: 'Delete todo-label successfuly',
   });
 });
 

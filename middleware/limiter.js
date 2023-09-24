@@ -1,14 +1,14 @@
-const rateLimit = require("express-rate-limit");
-const MongoStore = require("rate-limit-mongo");
-const { env } = require("../config/env");
+const rateLimit = require('express-rate-limit');
+const MongoStore = require('rate-limit-mongo');
+const { env } = require('../config/env');
 
 const rateLimiter = (windowMs = 1 * 60 * 1000, max) => {
   const limiter = rateLimit({
     store: new MongoStore({
-      collectionName: "Limiter",
+      collectionName: 'Limiter',
       uri: env.MONGO_URI,
       expireTimeMs: windowMs,
-      errorHandler: console.error.apply.bind(null, "rate-limit-mongo"),
+      errorHandler: console.error.apply.bind(null, 'rate-limit-mongo'),
     }),
     windowMs,
     max,

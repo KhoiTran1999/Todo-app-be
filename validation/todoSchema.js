@@ -1,6 +1,6 @@
-const Joi = require("joi");
+const Joi = require('joi');
 
-const title = Joi.string().min(1).max(1000).allow("", null);
+const title = Joi.string().min(1).max(1000).allow('', null);
 const content = Joi.string().min(1).max(20000);
 const pin = Joi.boolean();
 const reminder = Joi.date().allow(null);

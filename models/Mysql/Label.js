@@ -1,8 +1,8 @@
-const { sequelize } = require("../../database/mysql/connectMysql");
-const { DataTypes } = require("sequelize");
-const User = require("./User");
+const { sequelize } = require('../../database/mysql/connectMysql');
+const { DataTypes } = require('sequelize');
+const User = require('./User');
 
-const Label = sequelize.define("Label", {
+const Label = sequelize.define('Label', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -18,7 +18,7 @@ const Label = sequelize.define("Label", {
     allowNull: false,
     references: {
       model: User,
-      key: "id",
+      key: 'id',
     },
   },
 });

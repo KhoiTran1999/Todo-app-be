@@ -1,27 +1,27 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const controller = require("../controller/todo");
-const validator = require("../middleware/validator");
-const { addTodoSchema, udpateTodoSchema } = require("../validation/todoSchema");
+const controller = require('../controller/todo');
+const validator = require('../middleware/validator');
+const { addTodoSchema, udpateTodoSchema } = require('../validation/todoSchema');
 
-router.get("/", controller.getTodo);
+router.get('/', controller.getTodo);
 
-router.get("/archive", controller.getArchiveTodo);
+router.get('/archive', controller.getArchiveTodo);
 
-router.get("/trash", controller.getDeletedTodo);
+router.get('/trash', controller.getDeletedTodo);
 
-router.get("/restore/:id", controller.restoreTodo);
+router.get('/restore/:id', controller.restoreTodo);
 
-router.get("/all", controller.getAllTodo);
+router.get('/all', controller.getAllTodo);
 
-router.get("/search", controller.getSearchTodo);
+router.get('/search', controller.getSearchTodo);
 
-router.post("/", validator(addTodoSchema), controller.addTodo);
+router.post('/', validator(addTodoSchema), controller.addTodo);
 
-router.delete("/:id", controller.deleteTodo);
+router.delete('/:id', controller.deleteTodo);
 
-router.delete("/permanent/:id", controller.deleteTodoPermanently);
+router.delete('/permanent/:id', controller.deleteTodoPermanently);
 
-router.patch("/:id", validator(udpateTodoSchema), controller.updateTodo);
+router.patch('/:id', validator(udpateTodoSchema), controller.updateTodo);
 
 module.exports = router;

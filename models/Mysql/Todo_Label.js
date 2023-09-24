@@ -1,11 +1,11 @@
-const { sequelize } = require("../../database/mysql/connectMysql");
-const { DataTypes } = require("sequelize");
-const Todo = require("./Todo");
-const Label = require("./Label");
-const User = require("./User");
+const { sequelize } = require('../../database/mysql/connectMysql');
+const { DataTypes } = require('sequelize');
+const Todo = require('./Todo');
+const Label = require('./Label');
+const User = require('./User');
 
 const Todo_Label = sequelize.define(
-  "Todo_Label",
+  'Todo_Label',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -17,7 +17,7 @@ const Todo_Label = sequelize.define(
       allowNull: false,
       references: {
         model: Todo,
-        key: "id",
+        key: 'id',
       },
     },
     labelId: {
@@ -25,7 +25,7 @@ const Todo_Label = sequelize.define(
       allowNull: false,
       references: {
         model: Label,
-        key: "id",
+        key: 'id',
       },
     },
     userId: {
@@ -33,13 +33,13 @@ const Todo_Label = sequelize.define(
       allowNull: false,
       references: {
         model: User,
-        key: "id",
+        key: 'id',
       },
     },
   },
   {
-    indexes: [{ unique: true, fields: ["todoId", "labelId", "userId"] }],
-  }
+    indexes: [{ unique: true, fields: ['todoId', 'labelId', 'userId'] }],
+  },
 );
 
 module.exports = Todo_Label;

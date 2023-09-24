@@ -1,5 +1,5 @@
 const validator =
-  (schema, property = "body") =>
+  (schema, property = 'body') =>
   (req, res, next) => {
     const { error } = schema.validate(req[property]);
 

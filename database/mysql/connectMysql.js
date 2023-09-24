@@ -1,5 +1,5 @@
-const { Sequelize } = require("sequelize");
-const { env } = require("../../config/env");
+const { Sequelize } = require('sequelize');
+const { env } = require('../../config/env');
 
 const sequelize = new Sequelize(
   env.MYSQL_DATABASE,
@@ -10,12 +10,12 @@ const sequelize = new Sequelize(
     host: env.MYSQL_HOST,
     dialect: env.MYSQL_DIALECT,
     logging: false,
-  }
+  },
 );
 
 const connectMysql = async () => {
-  await sequelize.sync({ logging: false, alter: false });
-  console.log("Mysql have been connected");
+  await sequelize.authenticate();
+  console.log('Mysql have been connected');
 };
 
 module.exports = { connectMysql, sequelize };
