@@ -5,16 +5,27 @@ const { DataTypes } = require('sequelize');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('labels', {
+    await queryInterface.createTable('todo_labels', {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
-      name: {
-        type: DataTypes.STRING,
+      todoId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        unique: true,
+        references: {
+          model: 'todos',
+          key: 'id',
+        },
+      },
+      labelId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'labels',
+          key: 'id',
+        },
       },
       userId: {
         type: DataTypes.INTEGER,
@@ -24,10 +35,22 @@ module.exports = {
           key: 'id',
         },
       },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal(
+          'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+        ),
+      },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('labels');
+    await queryInterface.dropTable('todo_labels');
   },
 };
