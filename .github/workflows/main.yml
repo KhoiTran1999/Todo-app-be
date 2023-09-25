@@ -8,6 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
       - uses: actions/checkout@v3
 
@@ -22,3 +26,24 @@ jobs:
 
       - name: Docker Push
         run: docker push ${{ secrets.DOCKER_USERNAME }}/fast-note:todo-app-be
+
+      - name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          workload_identity_provider: '${{secrets.WIF_PROVIDER}}'
+          service_account: '${{secrets.SA_EMAIL}}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - uses: 'google-github-actions/ssh-compute@v0'
+        with:
+          instance_name: 'instance-1'
+          zone: 'asia-southeast1-b'
+          ssh_private_key: '${{secrets.GCP_SSH_PRIVATE_KEY}}'
+          command: 'echo tuyet voi'
+
+      - name: Deploy
+        shell: pwsh
+        run: |-
+          gcloud compute ssh --zone "asia-southeast1-b" "instance-1" --project "fastnote-399603" --command 'sudo docker stop backend && sudo docker rm backend && sudo docker image rm khoitran990120/fast-note:todo-app-be && sudo docker run --name backend --network todo-network -e MYSQL_DATABASE=mysql -dp 443:443 khoitran990120/fast-note:todo-app-be'
