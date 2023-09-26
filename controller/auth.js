@@ -106,7 +106,7 @@ const verifyEmail = asyncMiddleware(async (req, res, next) => {
     html: `<h2>Hi ${email},</h2>
           <p>You requested to verify your email account recently. <br>Click the link below to verify your email. <strong>This Link is only valid for the next 1 minute.</strong></p>
           <div style= "display: flex; justify-content: center; margin: 10px">
-            <a href="${env.SERVER_URL}/api/v1/auth/checkEmailToken/${encodeToken}" style="background-color: rgb(34,188,102); color: white; font-size: 30px; padding: 4px; border-radius: 2px">Click here</a>
+            <a href="${env.SERVER_URL}/v1/auth/checkEmailToken/${encodeToken}" style="background-color: rgb(34,188,102); color: white; font-size: 30px; padding: 4px; border-radius: 2px">Click here</a>
           </div>
           <p>Thanks,
           <br>Fast Note Team</p>`,
@@ -154,6 +154,10 @@ const getToken = asyncMiddleware(async (req, res, next) => {
     });
   }
 
+  jwt.verify(refreshToken, env.JWT_REFRESHTOKEN_PRIVATE_KEY, (err) => {
+    if (err) throw new ErrorResponse(401, err);
+  });
+
   if (!accessToken) {
     return res.status(401).json({
       success: false,
@@ -162,10 +166,14 @@ const getToken = asyncMiddleware(async (req, res, next) => {
     });
   }
 
+  jwt.verify(accessToken, env.JWT_ACCESSTOKEN_PRIVATE_KEY, (err) => {
+    if (err) throw new ErrorResponse(401, err);
+  });
+
   res.json({
     success: true,
-    accessToken: req.cookies.accessToken,
-    refreshToken: req.cookies.refreshToken,
+    accessToken,
+    refreshToken,
   });
 });
 

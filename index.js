@@ -36,13 +36,13 @@ connectMongo()
   .catch((err) => console.log(err));
 
 //Auth API
-app.use('/api/v1/auth', morgan('short'), authRouter);
+app.use('/v1/auth', morgan('short'), authRouter);
 
 //Todo API
-app.use('/api/v1/todo', jwtAuth, todoRouter);
+app.use('/v1/todo', jwtAuth, todoRouter);
 
 //Label API
-app.use('/api/v1/label', jwtAuth, labelRouter);
+app.use('/v1/label', jwtAuth, labelRouter);
 
 //Middleware
 app.use(errorMiddleware);
