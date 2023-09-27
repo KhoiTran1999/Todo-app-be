@@ -46,4 +46,4 @@ jobs:
       - name: Deploy
         shell: pwsh
         run: |-
-          gcloud compute ssh --zone "asia-southeast1-b" "instance-1" --project "fastnote-399603" --command 'sudo docker stop backend && sudo docker rm backend && sudo docker image rm khoitran990120/fast-note:todo-app-be && sudo docker run --name backend --network todo-network -e MYSQL_DATABASE=mysql -e EMAIL_CLIENT_SECRET=${{secrets.EMAIL_CLIENT_SECRET}} -e EMAIL_REFRESH_TOKEN=${{secrets.EMAIL_REFRESH_TOKEN}} -dp 443:443 khoitran990120/fast-note:todo-app-be'
+          gcloud compute ssh --zone "asia-southeast1-b" "instance-1" --project "fastnote-399603" --command 'sudo docker stop backend && sudo docker rm backend && sudo docker image rm khoitran990120/fast-note:todo-app-be && sudo docker run --name backend --network todo-network -e MYSQL_DATABASE=mysql -dp 443:443 khoitran990120/fast-note:todo-app-be'
