@@ -7,6 +7,74 @@ const jwt = require('jsonwebtoken');
 const registerToken = require('../models/Mongo/registerToken');
 const mail = require('../services/mail');
 
+/**
+ * @swagger
+ * tags:
+ *  name: Auth
+ *  description: Auth APIs
+ * /auth/register:
+ *  post:
+ *   tags: [Auth]
+ *   summary: create a new user
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#/components/schemas/CreateUser'
+ *   responses:
+ *    201:
+ *     description: Created
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/RegisterSuccessResponse'
+ *    409:
+ *     description: This email have been registerd
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/RegisterErrorResponse'
+ * components:
+ *  schemas:
+ *   CreateUser:
+ *    type: object
+ *    required:
+ *     - username
+ *     - email
+ *     - password
+ *    properties:
+ *     username:
+ *      type: string
+ *      description: The username of the user
+ *     password:
+ *      type: string
+ *      description: The password of the user
+ *     email:
+ *      type: string
+ *      description: The email of the user
+ *    example:
+ *     username: david
+ *     email: david@gmail.com
+ *     password: "123456"
+ *   RegisterSuccessResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of the response
+ *    example:
+ *     success: true
+ *   RegisterErrorResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of failed response
+ *    example:
+ *     success: false
+ */
+
 const register = asyncMiddleware(async (req, res, next) => {
   const { username, email, password } = req.body;
 
@@ -24,6 +92,73 @@ const register = asyncMiddleware(async (req, res, next) => {
     message: 'Registered successfully',
   });
 });
+
+/**
+ * @swagger
+ * /auth/login:
+ *  post:
+ *   tags: [Auth]
+ *   summary: login to Fastnote
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#/components/schemas/LoginUser'
+ *   responses:
+ *    200:
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/LoginSuccessResponse'
+ *    401:
+ *     description: Invalid email/password
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/LoginErrorResponse'
+ * components:
+ *  schemas:
+ *   LoginUser:
+ *    type: object
+ *    required:
+ *     - email
+ *     - password
+ *    properties:
+ *     password:
+ *      type: string
+ *      description: The password of the user
+ *     email:
+ *      type: string
+ *      description: The email of the user
+ *    example:
+ *     email: david@gmail.com
+ *     password: "123456"
+ *   LoginSuccessResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of the response
+ *     token:
+ *      type: string
+ *      description: The token of the user
+ *    example:
+ *     success: true
+ *     token: {accessToken: df234qwejf2..., refreshToken: jgi1249ggler34...}
+ *   LoginErrorResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of failed response
+ *     message:
+ *      type: string
+ *      description: The description of failed response
+ *    example:
+ *     success: false
+ *     message: Invalid email/password
+ */
 
 const login = asyncMiddleware(async (req, res, next) => {
   const { email, password } = req.body;
@@ -77,6 +212,69 @@ const login = asyncMiddleware(async (req, res, next) => {
     });
 });
 
+/**
+ * @swagger
+ * /auth/verifyEmail:
+ *  post:
+ *   tags: [Auth]
+ *   summary: verify users'Email
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#/components/schemas/VerifyEmail'
+ *   responses:
+ *    200:
+ *     description: A mail have been sent
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/VerifyEmailSccessResponse'
+ *    409:
+ *     description: Conflict
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/ErrorVerifyEmailResponse'
+ * components:
+ *  schemas:
+ *   VerifyEmail:
+ *    type: object
+ *    required:
+ *     - email
+ *    properties:
+ *     email:
+ *      type: string
+ *      description: The email that user want to register
+ *    example:
+ *     email: david@gmail.com
+ *   VerifyEmailSccessResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of the response
+ *     message:
+ *      type: string
+ *      description: The description of failed response
+ *    example:
+ *     success: true
+ *     message: A verify email have been sent to your Email
+ *   ErrorVerifyEmailResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of failed response
+ *     message:
+ *      type: string
+ *      description: The description of failed response
+ *    example:
+ *     success: false
+ *     message: This email have been used
+ */
+
 const verifyEmail = asyncMiddleware(async (req, res, next) => {
   const { email } = req.body;
 
@@ -118,6 +316,43 @@ const verifyEmail = asyncMiddleware(async (req, res, next) => {
   });
 });
 
+/**
+ * @swagger
+ * /auth/checkEmailToken/{token}:
+ *  get:
+ *   tags: [Auth]
+ *   summary: check Email to verify
+ *   description: to check that user use their own real email
+ *   parameters:
+ *    - name: token
+ *      in: path
+ *      description: token of user
+ *      required: true
+ *      schema:
+ *        type: string
+ *   responses:
+ *    401:
+ *     description: Unauthorized
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/UnauthorizeCheckEmail'
+ * components:
+ *  schemas:
+ *   UnauthorizeCheckEmail:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of failed response
+ *     message:
+ *      type: string
+ *      description: The description of failed response
+ *    example:
+ *     success: false
+ *     message: Unauthorized
+ */
+
 const checkEmailToken = asyncMiddleware(async (req, res, next) => {
   const { token } = req.params;
   const decodeToken = decodeURIComponent(token);
@@ -142,6 +377,71 @@ const checkEmailToken = asyncMiddleware(async (req, res, next) => {
 
   res.redirect(`${env.CLIENT_URL}/register/${encodeURIComponent(decodeToken)}`);
 });
+
+/**
+ * @swagger
+ * /auth/cookie/getToken:
+ *  get:
+ *   tags: [Auth]
+ *   summary: pass a couple of cookie to user
+ *   responses:
+ *    200:
+ *     description: Cookie have been setted
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/GetCookieSccessResponse'
+ *    404:
+ *     description: Not found
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/ErrorNotFoundTokenResponse'
+ *    401:
+ *     description: Not found
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/ErrorExpriedTokenResponse'
+ * components:
+ *  schemas:
+ *   GetCookieSccessResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of the response
+ *     token:
+ *      type: string
+ *      description: The token of the user
+ *    example:
+ *     success: true
+ *     token: {accessToken: df234qwejf2..., refreshToken: jgi1249ggler34...}
+ *   ErrorNotFoundTokenResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of failed response
+ *     message:
+ *      type: string
+ *      description: The description of failed response
+ *    example:
+ *     success: false
+ *     message: Token doesn't exist
+ *   ErrorExpriedTokenResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of failed response
+ *     message:
+ *      type: string
+ *      description: The description of failed response
+ *    example:
+ *     success: false
+ *     message: AccessToken have been expired
+ */
 
 const getToken = asyncMiddleware(async (req, res, next) => {
   const accessToken = req.cookies.accessToken;
@@ -177,6 +477,43 @@ const getToken = asyncMiddleware(async (req, res, next) => {
   });
 });
 
+/**
+ * @swagger
+ * /cookie/refreshToken:
+ *  get:
+ *   tags: [Auth]
+ *   summary: Renew accessToken
+ *   security:
+ *    - bearerAuth: []
+ *   responses:
+ *    201:
+ *     description: Renew accessToken
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/RefressTokenSuccessResponse'
+ *    409:
+ *     description: This email have been registerd
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/RegisterErrorResponse'
+ * components:
+ *  schemas:
+ *   RefressTokenSuccessResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of the response
+ *     accessToken:
+ *      type: string
+ *      description: Token
+ *    example:
+ *     success: true
+ *     accessToken: ds1234kljq234...
+ */
+
 const refreshToken = asyncMiddleware(async (req, res, next) => {
   const user = req.user;
   const newAccessToken = jwt.sign(
@@ -196,6 +533,30 @@ const refreshToken = asyncMiddleware(async (req, res, next) => {
       accessToken: newAccessToken,
     });
 });
+
+/**
+ * @swagger
+ * /cookie/clearToken:
+ *  delete:
+ *   tags: [Auth]
+ *   summary: clear Token
+ *   responses:
+ *    200:
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/ClearTokenSuccessResponse'
+ * components:
+ *  schemas:
+ *   ClearTokenSuccessResponse:
+ *    type: object
+ *    properties:
+ *     success:
+ *      type: boolean
+ *      description: The status of the response
+ *    example:
+ *     success: true
+ */
 
 const clearToken = asyncMiddleware(async (req, res, next) => {
   res.clearCookie('accessToken');

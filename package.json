@@ -33,7 +33,9 @@
     "nodemailer": "^6.9.4",
     "path": "^0.12.7",
     "rate-limit-mongo": "^2.3.2",
-    "sequelize": "^6.32.1"
+    "sequelize": "^6.32.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
