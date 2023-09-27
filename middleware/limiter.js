@@ -10,6 +10,7 @@ const rateLimiter = (windowMs = 1 * 60 * 1000, max) => {
       expireTimeMs: windowMs,
       errorHandler: console.error.apply.bind(null, 'rate-limit-mongo'),
     }),
+    validate: { trustProxy: false },
     windowMs,
     max,
     standardHeaders: true,
