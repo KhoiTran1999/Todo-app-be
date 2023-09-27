@@ -13,9 +13,4 @@ const sequelize = new Sequelize(
   },
 );
 
-const connectMysql = async () => {
-  await sequelize.authenticate();
-  console.log('Mysql have been connected');
-};
-
-module.exports = { connectMysql, sequelize };
+module.exports = { sequelize };

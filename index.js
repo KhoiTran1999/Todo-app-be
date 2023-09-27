@@ -3,7 +3,7 @@ require('./models/Mysql/relationship');
 const express = require('express');
 const app = express();
 const { env } = require('./config/env');
-const { connectMysql } = require('./database/mysql/connectMysql');
+const { connectMysql, sequelize } = require('./database/mysql/connectMysql');
 const morgan = require('morgan');
 const authRouter = require('./router/auth');
 const todoRouter = require('./router/todo');
@@ -69,7 +69,10 @@ app.use(
 );
 app.use(cookieParser());
 //Connect Mysql database
-connectMysql().catch((err) => console.log(err));
+sequelize
+  .authenticate()
+  .then(() => console.log('Mysql have been connected'))
+  .catch((err) => JSON.stringify(err, null, 2));
 
 //Connect Mongo database
 connectMongo()
