@@ -71,7 +71,7 @@ app.use(cookieParser());
 //Connect Mysql database
 sequelize
   .authenticate()
-  .then(() => console.log('Mysql have been connected'))
+  .then(() => console.log('MySql have been connected'))
   .catch((err) => JSON.stringify(err, null, 2));
 
 //Connect Mongo database
