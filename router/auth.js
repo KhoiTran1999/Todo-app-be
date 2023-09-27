@@ -8,18 +8,9 @@ const rateLimiter = require('../middleware/limiter');
 
 router.post('/register', validator(registerSchema), controller.register);
 
-router.post(
-  '/login',
-  rateLimiter(2 * 60 * 1000, 10),
-  validator(loginShema),
-  controller.login,
-);
+router.post('/login', validator(loginShema), controller.login);
 
-router.post(
-  '/verifyEmail',
-  rateLimiter(2 * 60 * 1000, 10),
-  controller.verifyEmail,
-);
+router.post('/verifyEmail', controller.verifyEmail);
 
 router.get('/checkEmailToken/:token', controller.checkEmailToken);
 
