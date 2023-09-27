@@ -16,12 +16,10 @@ module.exports = {
     dialect: env.MYSQL_DIALECT,
   },
   production: {
-    production: {
-      username: 'root',
-      password: 'khoitran990120',
-      database: 'mysql',
-      host: 'mysql',
-      dialect: 'mysql',
-    },
+    username: 'root',
+    password: 'khoitran990120',
+    database: 'mysql',
+    host: 'mysql',
+    dialect: 'mysql',
   },
 };
