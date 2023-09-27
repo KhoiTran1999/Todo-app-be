@@ -14,7 +14,7 @@ const sequelize = new Sequelize(
 );
 
 const connectMysql = async () => {
-  await sequelize.authenticate();
+  await sequelize.sync();
   console.log('Mysql have been connected');
 };
 
