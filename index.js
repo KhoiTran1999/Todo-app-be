@@ -70,7 +70,7 @@ app.use(
 app.use(cookieParser());
 //Connect Mysql database
 sequelize
-  .authenticate()
+  .sync()
   .then(() => console.log('MySql have been connected'))
   .catch((err) => JSON.stringify(err, null, 2));
 
