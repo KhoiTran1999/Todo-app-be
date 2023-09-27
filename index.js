@@ -55,6 +55,7 @@ const specs = swaggerDoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 //Middleware
+app.set('trust proxy', 1);
 app.use(express.json());
 
 app.use(
