@@ -29,6 +29,6 @@ exports.env = {
     '1//04duHtsit9AnBCgYIARAAGAQSNwF-L9IrL_D2v72xU2By7KJqfjxld8iETsXdWhOA6MUvDNXTtsFJNpVHHr71gJ6XM20P7hkXVOI',
   EMAIL: process.env.EMAIL || 'tranquockhoi1999@gmail.com',
 
-  SERVER_URL: process.env.SERVER_URL || 'http://localhost:3200',
+  SERVER_URL: process.env.SERVER_URL || 'http://localhost:80',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:3000',
 };
